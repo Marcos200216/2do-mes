@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Así de grande es mi amor por ti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wine-deep:#3d0e1a;
+    --wine-dark:#22070d;
+    --gold:#c9a15a;
+    --gold-light:#e8cd94;
+    --parchment:#f6ead7;
+    --rose:#d88a9a;
+    --glass:#f6ead7;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    min-height:100%;
+    background:var(--wine-dark);
+    color:var(--parchment);
+    font-family:'Cormorant Garamond', serif;
+    overflow-x:hidden;
+  }
+  body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-height:100vh;
+  }
+
+  /* ---------- fireflies ambient bg ---------- */
+  #fireflies{
+    position:fixed;inset:0;
+    pointer-events:none;
+    z-index:1;
+    overflow:hidden;
+  }
+  .firefly-bg{
+    position:absolute;
+    width:4px;height:4px;
+    border-radius:50%;
+    background:var(--gold-light);
+    box-shadow:0 0 8px 3px rgba(232,205,148,0.65);
+    opacity:0;
+    animation:floaty linear infinite;
+  }
+  @keyframes floaty{
+    0%{transform:translateY(0) translateX(0);opacity:0;}
+    10%{opacity:.9;}
+    90%{opacity:.7;}
+    100%{transform:translateY(-110vh) translateX(20px);opacity:0;}
+  }
+
+  /* ---------- close button ---------- */
+  .close-btn{
+    position:fixed;
+    top:22px;right:26px;
+    z-index:50;
+    width:38px;height:38px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(61,14,26,0.55);
+    border:1px solid var(--gold);
+    color:var(--gold-light);
+    font-size:18px;
+    text-decoration:none;
+    backdrop-filter:blur(3px);
+    transition:transform .25s ease, background .25s ease;
+  }
+  .close-btn:hover{transform:rotate(90deg);background:rgba(61,14,26,0.85);}
+
+  /* ---------- header ---------- */
+  .header{
+    position:relative;z-index:2;
+    text-align:center;
+    padding:70px 22px 10px;
+  }
+  .header h1{
+    font-family:'Alex Brush', cursive;
+    color:var(--gold-light);
+    font-size:clamp(2.4rem, 7vw, 3.8rem);
+    margin:0 0 8px 0;
+    text-shadow:0 0 18px rgba(201,161,90,0.35);
+  }
+  .header p{
+    font-size:clamp(1rem,2.6vw,1.2rem);
+    font-style:italic;
+    color:var(--parchment);
+    opacity:.85;
+    max-width:440px;
+    margin:0 auto;
+  }
+
+  /* ---------- jar stage ---------- */
+  .stage{
+    position:relative;z-index:2;
+    flex:1;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px 22px 40px;
+  }
+  .jar-wrap{
+    position:relative;
+    width:min(62vw, 260px);
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:transform .15s ease;
+  }
+  .jar-wrap:active{transform:scale(0.97);}
+  .jar-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
+
+  .tap-hint{
+    margin-top:22px;
+    font-size:.95rem;
+    letter-spacing:.08em;
+    color:var(--gold);
+    opacity:.85;
+    text-align:center;
+    transition:opacity .5s ease;
+  }
+  .tap-hint .pulse{
+    display:inline-block;
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:.5;}
+    50%{opacity:1;}
+  }
+
+  .caption{
+    margin-top:28px;
+    min-height:2.4em;
+    max-width:420px;
+    text-align:center;
+    font-family:'Special Elite', monospace;
+    font-size:clamp(0.95rem, 3vw, 1.15rem);
+    color:var(--gold-light);
+    opacity:0;
+    transition:opacity .5s ease;
+    text-shadow:0 2px 10px rgba(0,0,0,0.5);
+  }
+  .caption.show{opacity:1;}
+
+  /* flying firefly (html, absolutely positioned over viewport) */
+  .flyer{
+    position:fixed;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold-light);
+    box-shadow:0 0 10px 4px rgba(232,205,148,0.85);
+    z-index:30;
+    pointer-events:none;
+    transition:transform 0.9s cubic-bezier(.2,.7,.3,1), opacity 0.9s ease;
+  }
+  .burst-flyer{
+    position:fixed;
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold-light);
+    box-shadow:0 0 12px 5px rgba(232,205,148,0.9);
+    z-index:30;
+    pointer-events:none;
+    transition:transform 1.4s ease-out, opacity 1.4s ease-out;
+  }
+
+  /* ---------- finale ---------- */
+  .finale{
+    position:relative;z-index:2;
+    width:100%;
+    max-width:520px;
+    text-align:center;
+    padding:10px 22px 90px;
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity 1s ease, transform 1s ease;
+    pointer-events:none;
+  }
+  .finale.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .finale h2{
+    font-family:'Alex Brush', cursive;
+    font-size:clamp(2.2rem, 6.5vw, 3.2rem);
+    color:var(--gold-light);
+    margin:10px 0 14px 0;
+    text-shadow:0 0 18px rgba(201,161,90,0.35);
+  }
+  .finale p{
+    font-size:clamp(1.05rem, 3vw, 1.25rem);
+    line-height:1.65;
+    color:var(--parchment);
+    opacity:.92;
+  }
+  .finale .signature{
+    margin-top:22px;
+    font-family:'Alex Brush', cursive;
+    font-size:clamp(1.5rem, 4.5vw, 2rem);
+    color:var(--rose);
+  }
+</style>
+</head>
+<body>
+
+  <div id="fireflies"></div>
+  <a href="index2.html" class="close-btn" aria-label="Cerrar">✕</a>
+
+  <div class="header">
+    <h1>Así de grande es mi amor por ti</h1>
+    <p>toca el frasco y ve atrapando mis luciérnagas, una por una</p>
+  </div>
+
+  <div class="stage">
+    <div class="jar-wrap" id="jarWrap">
+      <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="jarClip">
+            <rect x="120" y="190" width="160" height="240" rx="28"/>
+          </clipPath>
+          <linearGradient id="fillGrad" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#e8cd94"/>
+            <stop offset="100%" stop-color="#f6ead7"/>
+          </linearGradient>
+          <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="6" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- glow inside jar, grows with fill -->
+        <g clip-path="url(#jarClip)">
+          <rect id="jarFill" x="120" y="430" width="160" height="0" fill="url(#fillGrad)" opacity="0.55" filter="url(#softGlow)"/>
+          <g id="caughtFireflies"></g>
+        </g>
+
+        <!-- jar glass body -->
+        <rect x="120" y="190" width="160" height="240" rx="28" fill="rgba(246,234,215,0.06)" stroke="var(--glass)" stroke-width="3" opacity="0.9"/>
+        <!-- glass highlight -->
+        <path d="M140,210 Q136,300 140,410" stroke="rgba(246,234,215,0.5)" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+        <!-- neck -->
+        <rect x="165" y="150" width="70" height="46" rx="10" fill="rgba(246,234,215,0.06)" stroke="var(--glass)" stroke-width="3"/>
+
+        <!-- lid -->
+        <ellipse cx="200" cy="140" rx="48" ry="17" fill="var(--gold)"/>
+        <ellipse cx="200" cy="134" rx="48" ry="15" fill="var(--gold-light)"/>
+        <!-- wax seal M&M -->
+        <circle cx="200" cy="134" r="17" fill="var(--wine-deep)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="200" y="140" text-anchor="middle" font-family="'Alex Brush', cursive" font-size="18" fill="var(--gold-light)">M&amp;M</text>
+      </svg>
+    </div>
+
+    <div class="tap-hint" id="tapHint"><span class="pulse">toca el frasco ✦</span></div>
+    <div class="caption" id="caption"></div>
+
+    <div class="finale" id="finale">
+      <h2>Ni todas las luciérnagas del mundo</h2>
+      <p>
+        alcanzan para medir cuánto te amo. Cada una que atrapaste hoy es solo
+        una chispita de todo lo que siento por ti, y aunque el frasco ya está
+        lleno, mi amor por ti sigue encontrando espacio para crecer.
+      </p>
+      <div class="signature">tu Marquitos</div>
+    </div>
+  </div>
+
+<script>
+  // ambient fireflies
+  (function(){
+    const container = document.getElementById('fireflies');
+    const total = 24;
+    for(let i=0;i<total;i++){
+      const f = document.createElement('div');
+      f.className = 'firefly-bg';
+      const left = Math.random()*100;
+      const delay = Math.random()*14;
+      const duration = 10 + Math.random()*10;
+      const bottomStart = Math.random()*100;
+      f.style.left = left+'vw';
+      f.style.top = bottomStart+'vh';
+      f.style.animationDelay = delay+'s';
+      f.style.animationDuration = duration+'s';
+      container.appendChild(f);
+    }
+  })();
+
+  // jar fill interaction
+  (function(){
+    const jarWrap = document.getElementById('jarWrap');
+    const jarFill = document.getElementById('jarFill');
+    const caughtGroup = document.getElementById('caughtFireflies');
+    const caption = document.getElementById('caption');
+    const tapHint = document.getElementById('tapHint');
+    const finale = document.getElementById('finale');
+
+    const TOTAL_TAPS = 22;
+    const JAR_BOTTOM = 430;
+    const JAR_TOP = 190;
+    const JAR_MAX_HEIGHT = JAR_BOTTOM - JAR_TOP; // 240
+    const JAR_X = 120, JAR_W = 160;
+
+    let taps = 0;
+    let filled = false;
+
+    const phrases = [
+      { min:0,  max:19, text:'una luciérnaga por cada vez que pienso en ti' },
+      { min:20, max:39, text:'otra por cada mañana que quiero despertar a tu lado' },
+      { min:40, max:59, text:'una más por cada vez que tu risa me alegra el día' },
+      { min:60, max:79, text:'otra por cada sueño que quiero construir contigo' },
+      { min:80, max:99, text:'una por cada "te amo" que se queda corto' }
+    ];
+
+    function setCaption(pct){
+      const match = phrases.find(p => pct >= p.min && pct <= p.max);
+      if(match){
+        if(caption.textContent !== match.text){
+          caption.classList.remove('show');
+          setTimeout(()=>{ caption.textContent = match.text; caption.classList.add('show'); }, 200);
+        } else {
+          caption.classList.add('show');
+        }
+      }
+    }
+
+    function spawnFlyer(targetX, targetY){
+      const f = document.createElement('div');
+      f.className = 'flyer';
+      const startX = Math.random()*window.innerWidth;
+      const startY = -20 - Math.random()*80;
+      f.style.left = startX+'px';
+      f.style.top = startY+'px';
+      f.style.opacity = '1';
+      document.body.appendChild(f);
+      requestAnimationFrame(()=>{
+        f.style.transform = `translate(${targetX-startX}px, ${targetY-startY}px)`;
+        f.style.opacity = '0.15';
+      });
+      setTimeout(()=> f.remove(), 950);
+    }
+
+    function addCaughtFirefly(pct){
+      const heightNow = (pct/100)*JAR_MAX_HEIGHT;
+      const cx = JAR_X + 20 + Math.random()*(JAR_W-40);
+      const cy = JAR_BOTTOM - Math.random()*Math.max(6, heightNow-6);
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', cx);
+      c.setAttribute('cy', cy);
+      c.setAttribute('r', 3.2);
+      c.setAttribute('fill', 'var(--gold-light)');
+      c.setAttribute('opacity', '0.9');
+      c.style.filter = 'drop-shadow(0 0 4px rgba(232,205,148,0.9))';
+      c.style.animation = `pulse ${1.2 + Math.random()*1.2}s ease-in-out infinite`;
+      caughtGroup.appendChild(c);
+    }
+
+    function burstOverflow(){
+      const rect = jarWrap.getBoundingClientRect();
+      const originX = rect.left + rect.width*0.5;
+      const originY = rect.top + rect.height*0.32;
+      const count = 26;
+      for(let i=0;i<count;i++){
+        setTimeout(()=>{
+          const f = document.createElement('div');
+          f.className = 'burst-flyer';
+          f.style.left = originX+'px';
+          f.style.top = originY+'px';
+          f.style.opacity = '1';
+          document.body.appendChild(f);
+          const angle = Math.random()*Math.PI*2;
+          const dist = 120 + Math.random()*Math.max(window.innerWidth, window.innerHeight)*0.5;
+          const dx = Math.cos(angle)*dist;
+          const dy = Math.sin(angle)*dist - 60;
+          requestAnimationFrame(()=>{
+            f.style.transform = `translate(${dx}px, ${dy}px)`;
+            f.style.opacity = '0';
+          });
+          setTimeout(()=> f.remove(), 1500);
+        }, i*35);
+      }
+    }
+
+    jarWrap.addEventListener('click', function(){
+      if(filled) return;
+      taps = Math.min(TOTAL_TAPS, taps+1);
+      const pct = Math.round((taps/TOTAL_TAPS)*100);
+
+      const rect = jarWrap.getBoundingClientRect();
+      const targetX = rect.left + rect.width*0.5;
+      const targetY = rect.top + rect.height*0.75;
+      spawnFlyer(targetX, targetY);
+
+      const newHeight = (pct/100)*JAR_MAX_HEIGHT;
+      jarFill.setAttribute('y', JAR_BOTTOM - newHeight);
+      jarFill.setAttribute('height', newHeight);
+      jarFill.style.transition = 'y 0.5s ease, height 0.5s ease';
+
+      addCaughtFirefly(pct);
+      setCaption(pct);
+
+      if(pct >= 100 && !filled){
+        filled = true;
+        tapHint.style.opacity = '0';
+        setTimeout(()=>{
+          burstOverflow();
+        }, 300);
+        setTimeout(()=>{
+          caption.classList.remove('show');
+          finale.classList.add('show');
+        }, 900);
+      } else if(taps === 1){
+        tapHint.textContent = 'sigue tocando ✦';
+      }
+    });
+  })();
+</script>
+</body>
+</html>
