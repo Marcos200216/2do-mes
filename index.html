@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Para Mi Amor</title>
+<title>Para mi niña preciosa</title>
 <style>
   :root {
     --pink-light: #ff9fc7;
@@ -230,12 +230,12 @@
       <div class="status-text" id="statusText">Ingresa la combinación, mi amor</div>
     </div>
 
-    <div class="brand">— hecho con amor —</div>
+    <div class="brand">— Hecho con amor —</div>
   </div>
 
   <div id="revealScreen">
     <canvas id="heartCanvas"></canvas>
-    <div class="love-text" id="loveText">I LOVE YOU</div>
+    <div class="love-text" id="loveText">TE AMO</div>
   </div>
 
 <script>
@@ -297,7 +297,7 @@
   function checkCombination() {
     const match = currentCombination.every((d, i) => d === CORRECT_CODE[i]);
     if (match) {
-      statusText.textContent = '¡Nuestro amor está abierto! 💞';
+      statusText.textContent = '¡Nuestro amor está abierto!';
       statusText.style.color = '#fff2c9';
       setTimeout(showReveal, 900);
     } else {
