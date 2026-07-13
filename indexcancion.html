@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuestra Canción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#efe6d6;
+    --cream-deep:#e6dac4;
+    --ink:#161311;
+    --gray:#7a726a;
+    --red:#e6394f;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background: var(--cream);
+    font-family:'Poppins', sans-serif;
+    color: var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    padding: 26px 14px;
+  }
+
+  .card{
+    width:100%; max-width: 380px;
+    background: var(--cream);
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    padding: 20px 20px 26px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+  }
+
+  .carousel{
+    position:relative;
+    width:100%;
+    aspect-ratio: 1 / 1.02;
+    border-radius: 16px;
+    overflow:hidden;
+    background: #ddd;
+  }
+  .carousel img, .carousel .slide-placeholder{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit: cover;
+    opacity:0;
+    transition: opacity 1s ease;
+  }
+  .carousel img.active, .carousel .slide-placeholder.active{ opacity:1; }
+  .slide-placeholder{
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Alex Brush', cursive;
+    font-size: 34px;
+    color: rgba(0,0,0,0.35);
+    text-align:center;
+  }
+  .dots{
+    position:absolute; bottom:12px; left:0; right:0;
+    display:flex; justify-content:center; gap:6px;
+    z-index:5;
+  }
+  .dot{
+    width:6px; height:6px; border-radius:50%;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(0,0,0,0.15);
+    cursor:pointer;
+    transition: transform 0.25s ease, background 0.25s ease;
+  }
+  .dot.active{ background: #fff; transform: scale(1.35); }
+
+  .meta-row{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    margin-top: 20px;
+  }
+  .meta-row h1{
+    font-size: 21px; font-weight:700; margin: 0 0 3px;
+  }
+  .meta-row p{
+    font-size: 14.5px; color: var(--gray); margin:0;
+  }
+  .heart-btn{
+    background:none; border:none; cursor:pointer; padding:4px;
+    color: var(--red);
+  }
+  .heart-btn svg{ width:24px; height:24px; transition: transform 0.2s ease; }
+  .heart-btn.liked svg{ fill: var(--red); }
+  .heart-btn:active svg{ transform: scale(1.25); }
+
+  .progress-wrap{ margin-top: 22px; }
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:3px; background: rgba(0,0,0,0.2);
+    border-radius:2px; outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:13px; height:13px; border-radius:50%;
+    background: var(--ink); cursor:pointer; margin-top:-5px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:13px; height:13px; border-radius:50%; background: var(--ink); border:none; cursor:pointer;
+  }
+  .time-row{
+    display:flex; justify-content:space-between;
+    font-size:12px; color: var(--gray); margin-top:6px;
+  }
+
+  .controls{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top: 22px;
+  }
+  .ctrl-btn{
+    background:none; border:none; cursor:pointer; color: var(--ink);
+    padding: 6px; opacity:0.85; transition: opacity 0.2s ease, color 0.2s ease;
+  }
+  .ctrl-btn svg{ width:20px; height:20px; }
+  .ctrl-btn:hover{ opacity:1; }
+  .ctrl-btn.active{ color: var(--red); opacity:1; }
+  .play-btn{
+    width:56px; height:56px; border-radius:50%;
+    background: var(--ink); color: var(--cream);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .play-btn svg{ width:22px; height:22px; }
+
+  .spotify-row{
+    display:flex; align-items:center; gap:14px;
+    margin-top: 26px;
+  }
+  .spotify-logo{ width:34px; height:34px; flex-shrink:0; }
+  .code-bars{
+    flex:1; height:34px; display:flex; align-items:center; gap:2px; overflow:hidden;
+  }
+  .code-bars span{
+    display:block; width:2.5px; background: var(--ink); border-radius:2px;
+  }
+
+  .quote{
+    text-align:center; font-style:italic; font-size:14.5px;
+    color: var(--ink); margin-top: 24px; line-height:1.5;
+  }
+
+  .close-btn{
+    position:fixed; top:18px; right:18px; z-index:20;
+    width:34px; height:34px; border-radius:50%;
+    background: var(--cream);
+    border: 1.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink); font-size:18px; text-decoration:none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .close-btn:hover{ transform: scale(1.08); background: var(--cream-deep); }
+
+  audio{ display:none; }
+</style>
+</head>
+<body>
+
+<a class="close-btn" href="index2.html" title="volver">&times;</a>
+
+<div class="card">
+
+  <div class="carousel" id="carousel">
+    <img src="imagen1.jpeg" class="active" alt="imagen 1">
+    <img src="imagen2.jpeg" alt="imagen 2">
+    <img src="imagen3.jpeg" alt="imagen 3">
+    <img src="imagen4.jpeg" alt="imagen 4">
+    <img src="imagen5.jpeg" alt="imagen 5">
+
+    <div class="dots" id="dots"></div>
+  </div>
+
+  <div class="meta-row">
+    <div>
+      <h1 id="songTitle">Tu Poeta</h1>
+      <p id="songArtist">Alex Campos</p>
+    </div>
+    <button class="heart-btn liked" id="heartBtn">
+      <svg viewBox="0 0 24 24"><path d="M20.8 4.6a5 5 0 0 0-7.1 0L12 6.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21l8.8-9.3a5 5 0 0 0 0-7.1z"/></svg>
+    </button>
+  </div>
+
+  <div class="progress-wrap">
+    <input type="range" id="progress" value="0" min="0" max="100" step="0.1">
+    <div class="time-row">
+      <span id="currentTime">0:00</span>
+      <span id="duration">0:00</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="shuffleBtn" title="aleatorio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3h4v4M21 3l-7 7M3 7l4-4M3 17l14 14M17 21h4v-4M21 21l-6.5-6.5"/></svg>
+    </button>
+    <button class="ctrl-btn" id="prevBtn" title="reiniciar">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 6v12L9 12z"/></svg>
+    </button>
+    <button class="play-btn" id="playBtn">
+      <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="ctrl-btn" id="nextBtn" title="reiniciar">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 6h-2v12h2zM4 6v12l11-6z"/></svg>
+    </button>
+    <button class="ctrl-btn" id="repeatBtn" title="repetir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    </button>
+  </div>
+
+  <div class="spotify-row">
+    <svg class="spotify-logo" viewBox="0 0 168 168" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="84" cy="84" r="84" fill="#1ED760"/>
+      <path fill="#191414" d="M119.7 118.5c-1.5 2.4-4.7 3.2-7.1 1.7-19.4-11.9-43.8-14.6-72.6-8-2.8.6-5.5-1.1-6.1-3.9-.6-2.8 1.1-5.5 3.9-6.1 31.4-7.2 58.4-4.1 80.1 9.1 2.4 1.5 3.2 4.7 1.7 7.1zm10.4-23.2c-1.9 3-5.8 3.9-8.8 2-22.2-13.6-56-17.6-82.2-9.6-3.3 1-6.8-.9-7.8-4.2-1-3.3.9-6.8 4.2-7.8 30-9.1 67.4-4.6 93 11.3 3 1.9 3.9 5.8 2 8.8zm.9-24.1C102.3 55.3 61.5 54 37.8 61.2c-3.9 1.2-8.1-1-9.3-4.9-1.2-3.9 1-8.1 4.9-9.3 27.5-8.3 72.8-6.7 101.7 10.6 3.5 2.1 4.6 6.6 2.5 10.1-2.1 3.5-6.6 4.6-10.1 2.5z"/>
+    </svg>
+    <div class="code-bars" id="codeBars"></div>
+  </div>
+
+  <p class="quote" id="quoteText">"Feliz 2do mes mi princesa, te amo"</p>
+</div>
+
+<audio id="audio" src="cancion.mp3" preload="metadata"></audio>
+
+<script>
+  /* ---- frase: reemplaza aquí cuando la tengas ---- */
+  document.getElementById('quoteText').textContent = '"Feliz 2do mes mi princesa, te amo"';
+
+  /* ---- carrusel ---- */
+  const slides = Array.from(document.querySelectorAll('.carousel .slide-placeholder, .carousel img'));
+  const dotsWrap = document.getElementById('dots');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goToSlide(i));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function goToSlide(i){
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  setInterval(() => {
+    goToSlide((current + 1) % slides.length);
+  }, 4000);
+
+  /* ---- barcode decorativo ---- */
+  const codeBars = document.getElementById('codeBars');
+  for(let i=0;i<48;i++){
+    const bar = document.createElement('span');
+    bar.style.height = (30 + Math.sin(i*1.3)*40 + Math.random()*30) + '%';
+    codeBars.appendChild(bar);
+  }
+
+  /* ---- reproductor ---- */
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const progress = document.getElementById('progress');
+  const currentTimeEl = document.getElementById('currentTime');
+  const durationEl = document.getElementById('duration');
+  const heartBtn = document.getElementById('heartBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const repeatBtn = document.getElementById('repeatBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function fmt(t){
+    if(isNaN(t)) return '0:00';
+    const m = Math.floor(t/60);
+    const s = Math.floor(t%60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    durationEl.textContent = fmt(audio.duration);
+    progress.max = audio.duration;
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    progress.value = audio.currentTime;
+    currentTimeEl.textContent = fmt(audio.currentTime);
+  });
+
+  progress.addEventListener('input', () => {
+    audio.currentTime = progress.value;
+  });
+
+  playBtn.addEventListener('click', () => {
+    if(audio.paused){
+      audio.play();
+      playIcon.innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+    } else {
+      audio.pause();
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  });
+
+  heartBtn.addEventListener('click', () => heartBtn.classList.toggle('liked'));
+
+  shuffleBtn.addEventListener('click', () => shuffleBtn.classList.toggle('active'));
+
+  repeatBtn.addEventListener('click', () => {
+    audio.loop = !audio.loop;
+    repeatBtn.classList.toggle('active', audio.loop);
+  });
+
+  prevBtn.addEventListener('click', () => { audio.currentTime = 0; });
+  nextBtn.addEventListener('click', () => { audio.currentTime = 0; });
+</script>
+</body>
+</html>

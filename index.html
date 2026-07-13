@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Mi Amor</title>
+<style>
+  :root {
+    --pink-light: #ff9fc7;
+    --pink-mid: #ff5da2;
+    --pink-deep: #d6207a;
+    --lock-body: #ff8fb8;
+    --lock-shackle: #f2d9df;
+    --wood: #6b3f2a;
+    --cream: #fff1f6;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #000;
+  }
+
+  /* ---------- LOCK SCREEN ---------- */
+  #lockScreen {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 30%, var(--pink-light), var(--pink-mid) 60%, var(--pink-deep) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, filter 0.8s ease;
+    overflow: hidden;
+  }
+
+  #lockScreen.fading {
+    opacity: 0;
+    filter: blur(6px);
+    pointer-events: none;
+  }
+
+  .heart-field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .heart-field span {
+    position: absolute;
+    color: rgba(255,255,255,0.35);
+    font-size: 22px;
+    animation: floatUp linear infinite;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.4; }
+    100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+  }
+
+  .lock-wrap {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .shackle {
+    width: 130px;
+    height: 110px;
+    border: 22px solid var(--lock-shackle);
+    border-bottom: none;
+    border-radius: 90px 90px 0 0;
+    margin-bottom: -34px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+  }
+
+  .lock-body {
+    position: relative;
+    width: 230px;
+    background: linear-gradient(160deg, #ffb6cf, var(--lock-body) 45%, #ff6fa5 100%);
+    border-radius: 22px;
+    padding: 28px 18px 22px;
+    box-shadow:
+      0 12px 24px rgba(180, 20, 90, 0.35),
+      inset 0 2px 4px rgba(255,255,255,0.5);
+  }
+
+  .tiny-heart {
+    position: absolute;
+    top: 10px;
+    font-size: 16px;
+    color: #ff2d78;
+  }
+  .tiny-heart.left { left: 18px; }
+  .tiny-heart.right { right: 18px; }
+
+  .digits {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .digit-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arrow-btn {
+    background: rgba(255,255,255,0.35);
+    border: none;
+    color: #7a1440;
+    width: 30px;
+    height: 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.1s ease;
+    user-select: none;
+  }
+  .arrow-btn:hover { background: rgba(255,255,255,0.55); }
+  .arrow-btn:active { transform: scale(0.9); }
+
+  .digit-box {
+    width: 44px;
+    height: 56px;
+    background: linear-gradient(160deg, #7a4a34, var(--wood) 60%, #4a2c1c);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffe9c9;
+    font-size: 26px;
+    font-weight: bold;
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.15), inset 0 -3px 5px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .digit-box span {
+    display: block;
+    transition: transform 0.25s ease;
+  }
+
+  .status-text {
+    margin-top: 22px;
+    color: #fff;
+    font-style: italic;
+    font-size: 17px;
+    text-align: center;
+    min-height: 24px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    transition: color 0.3s ease;
+  }
+
+  .brand {
+    position: absolute;
+    bottom: 18px;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  /* ---------- REVEAL SCREEN ---------- */
+  #revealScreen {
+    position: absolute;
+    inset: 0;
+    background: #050004;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+  }
+  #revealScreen.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #heartCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .love-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Brush Script MT', 'Segoe Script', cursive;
+    font-size: clamp(28px, 6vw, 56px);
+    color: #ff2fb0;
+    text-shadow: 0 0 12px #ff64c8, 0 0 26px #ff2fb0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 0 20px;
+  }
+  .love-text.show { opacity: 1; }
+
+
+</style>
+</head>
+<body>
+
+  <div id="lockScreen">
+    <div class="heart-field" id="heartField"></div>
+
+    <div class="lock-wrap">
+      <div class="shackle"></div>
+      <div class="lock-body">
+        <span class="tiny-heart left">💗</span>
+        <span class="tiny-heart right">💗</span>
+        <div class="digits" id="digits"></div>
+      </div>
+      <div class="status-text" id="statusText">Ingresa la combinación, mi amor</div>
+    </div>
+
+    <div class="brand">— hecho con amor —</div>
+  </div>
+
+  <div id="revealScreen">
+    <canvas id="heartCanvas"></canvas>
+    <div class="love-text" id="loveText">I LOVE YOU</div>
+  </div>
+
+<script>
+  /* ---------------- CONFIG ---------------- */
+  const CORRECT_CODE = [1, 4, 0, 5]; // <-- cambia aquí la contraseña
+  const currentCombination = [0, 0, 0, 0];
+
+  /* ---------------- floating hearts bg ---------------- */
+  const heartField = document.getElementById('heartField');
+  const heartChars = ['❤','💕','♡','💗'];
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+    s.style.left = Math.random() * 100 + '%';
+    s.style.fontSize = (14 + Math.random() * 18) + 'px';
+    s.style.animationDuration = (8 + Math.random() * 10) + 's';
+    s.style.animationDelay = (Math.random() * 10) + 's';
+    heartField.appendChild(s);
+  }
+
+  /* ---------------- digit wheels ---------------- */
+  const digitsContainer = document.getElementById('digits');
+  const statusText = document.getElementById('statusText');
+
+  CORRECT_CODE.forEach((_, i) => {
+    const col = document.createElement('div');
+    col.className = 'digit-col';
+
+    const up = document.createElement('button');
+    up.className = 'arrow-btn';
+    up.textContent = '▲';
+    up.onclick = () => changeDigit(i, 1);
+
+    const box = document.createElement('div');
+    box.className = 'digit-box';
+    box.id = 'digit-' + i;
+    const span = document.createElement('span');
+    span.textContent = '0';
+    box.appendChild(span);
+
+    const down = document.createElement('button');
+    down.className = 'arrow-btn';
+    down.textContent = '▼';
+    down.onclick = () => changeDigit(i, -1);
+
+    col.appendChild(up);
+    col.appendChild(box);
+    col.appendChild(down);
+    digitsContainer.appendChild(col);
+  });
+
+  function changeDigit(index, dir) {
+    currentCombination[index] = (currentCombination[index] + dir + 10) % 10;
+    const box = document.getElementById('digit-' + index);
+    box.querySelector('span').textContent = currentCombination[index];
+    checkCombination();
+  }
+
+  function checkCombination() {
+    const match = currentCombination.every((d, i) => d === CORRECT_CODE[i]);
+    if (match) {
+      statusText.textContent = '¡Nuestro amor está abierto! 💞';
+      statusText.style.color = '#fff2c9';
+      setTimeout(showReveal, 900);
+    } else {
+      statusText.textContent = 'Ingresa la combinación, mi amor';
+      statusText.style.color = '#fff';
+    }
+  }
+
+  /* ---------------- reveal transition ---------------- */
+  const lockScreen = document.getElementById('lockScreen');
+  const revealScreen = document.getElementById('revealScreen');
+  const loveText = document.getElementById('loveText');
+
+  function showReveal() {
+    lockScreen.classList.add('fading');
+    setTimeout(() => {
+      revealScreen.classList.add('show');
+      startHeartParticles();
+      setTimeout(() => {
+        loveText.classList.add('show');
+        // 3 segundos mostrando "I LOVE YOU" y luego se desintegra hacia index2.html
+        setTimeout(disintegrateAndGo, 3000);
+      }, 2200);
+    }, 700);
+  }
+
+  function disintegrateAndGo() {
+    // el texto se desvanece
+    loveText.style.transition = 'opacity 0.6s ease';
+    loveText.classList.remove('show');
+
+    // las partículas explotan hacia afuera en vez de mantenerse en el corazón
+    particles.forEach(p => {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = (Math.max(W, H)) * (0.6 + Math.random() * 0.6);
+      p.tx = p.x + Math.cos(angle) * dist;
+      p.ty = p.y + Math.sin(angle) * dist;
+      p.speed = 0.05 + Math.random() * 0.05;
+    });
+
+    // la pantalla se desvanece a negro y luego navega a index2.html
+    setTimeout(() => {
+      revealScreen.style.transition = 'opacity 1s ease';
+      revealScreen.style.opacity = '0';
+    }, 500);
+
+    setTimeout(() => {
+      window.location.href = 'index2.html';
+    }, 1700);
+  }
+
+  /* ---------------- particle heart animation ---------------- */
+  const canvas = document.getElementById('heartCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function heartPoint(t, scale, cx, cy) {
+    // parametric heart curve
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+    return { x: cx + x * scale, y: cy - y * scale };
+  }
+
+  let particles = [];
+  let animId = null;
+  let frame = 0;
+
+  function startHeartParticles() {
+    particles = [];
+    frame = 0;
+    const cx = W / 2;
+    const cy = H / 2;
+    const scale = Math.min(W, H) / 30;
+    const strokeWidth = scale * 0.85; // grosor del trazo del corazón
+    const outlineCount = 300;
+    const glowCount = 90; // brillo interior tenue, no relleno
+
+    // partículas que forman el contorno grueso del corazón
+    for (let i = 0; i < outlineCount; i++) {
+      const t = (i / outlineCount) * Math.PI * 2;
+      const base = heartPoint(t, scale, cx, cy);
+      const r = (Math.random() - 0.5) * strokeWidth;
+      const a = Math.random() * Math.PI * 2;
+      const tx = base.x + Math.cos(a) * r;
+      const ty = base.y + Math.sin(a) * r;
+
+      particles.push({
+        x: cx + (Math.random() - 0.5) * W,
+        y: cy + (Math.random() - 0.5) * H,
+        tx, ty,
+        size: 1.6 + Math.random() * 2.4,
+        speed: 0.02 + Math.random() * 0.03,
+        color: pickColor(),
+        twinkle: Math.random() * Math.PI * 2
+      });
+    }
+
+    // unas pocas partículas sueltas dentro, para dar brillo ambiental sin rellenar el corazón
+    for (let i = 0; i < glowCount; i++) {
+      const t = Math.random() * Math.PI * 2;
+      const fill = 0.2 + Math.random() * 0.55; // hacia el centro
+      const base = heartPoint(t, scale * fill, cx, cy);
+
+      particles.push({
+        x: cx + (Math.random() - 0.5) * W,
+        y: cy + (Math.random() - 0.5) * H,
+        tx: base.x,
+        ty: base.y,
+        size: 0.8 + Math.random() * 1.4,
+        speed: 0.015 + Math.random() * 0.02,
+        color: pickColor(),
+        twinkle: Math.random() * Math.PI * 2
+      });
+    }
+
+    if (animId) cancelAnimationFrame(animId);
+    animate();
+  }
+
+  function pickColor() {
+    const colors = ['#ff2d78', '#ff6fb0', '#ffd23f', '#ffffff', '#c93cff'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    frame++;
+    particles.forEach(p => {
+      p.x += (p.tx - p.x) * p.speed;
+      p.y += (p.ty - p.y) * p.speed;
+      p.twinkle += 0.05;
+      const alpha = 0.6 + Math.sin(p.twinkle) * 0.4;
+
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, alpha);
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    animId = requestAnimationFrame(animate);
+  }
+</script>
+</body>
+</html>
